@@ -1,11 +1,12 @@
 // Set up the ports, the URL passing listener and dependencies
 
 // Dependencies
-var express = require("express");
+const express = require("express");
+const path = require("path");
 
 // Port and app setup
-var app = express();
-var PORT = 3000;
+const app = express();
+const PORT = 3000;
 
 // Sets up the Express app to handle data parsing
 app.use(express.urlencoded({ extended: true }));
@@ -21,6 +22,8 @@ app.get("/", function(req, res) {
 
 app.get("/make/", function(req, res) {
     // Display make.html
+    console.log("Request being made:");
+    console.log(req);
     res.sendFile(path.join(__dirname, "make.html"));
 });
 
@@ -45,9 +48,8 @@ app.post("/api/tables", function(req, res) {
     // Remove spaces from newTable.routeName
     newTable.routeName = newTable.name.replace(/\s+/g, "").toLowerCase();
 
-    console.log(newTable);
 
-    if (tables.freeTable()) {
+    if (tables.reservedTables.length < 5) {
         tables.reservedTables.push(newTable);
         res.json(newTable);
         
@@ -60,6 +62,8 @@ app.post("/api/tables", function(req, res) {
 
         // Display message saying table was added to waiting list
     }
+
+    console.log(tables);
 
 });
 
@@ -74,13 +78,5 @@ app.listen(PORT, function() {
 tables = {
     // 
     reservedTables : [],
-    waitingListTables : [],
-    freeTable : function() {this.reservedTables.length < 5}
+    waitingListTables : []
 }
-
-// table = {
-//     name : "",
-//     phoneNumber : "",
-//     email : "",
-//     id : ""
-// }
