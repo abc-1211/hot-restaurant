@@ -10,10 +10,32 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
     <title>Hot Restaurant Booking</title>
+    <!--CSS styling-->
+    <style>
+        html, body {
+          height: 100%;
+          margin: 0;
+        }
+      
+        body {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        canvas {
+          border: 1px solid white;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <div class="jumbotron">
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
             <h1 class="display-4 text-center font-weight-bold">
                 <svg class="bi bi-star" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                     <path fill-rule="evenodd" d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.523-3.356c.329-.314.158-.888-.283-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767l-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288l1.847-3.658 1.846 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.564.564 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>
@@ -29,6 +51,11 @@
                 5 TABLES ONLY!!! FIRST COME FIRST SERVED!!!
             </h2>
             <br>
+            <h3 class="text-center">Blue to View Tables & Red to Reserver</h3>
+            <div class="text-center">
+                <canvas width="800" height="400" id="game"></canvas>
+            </div>
+            <br>
             <div class="text-center">
                 <a href="view.html">
                     <button type="button" class="btn btn-lg btn-primary">View Tables</button>
@@ -39,5 +66,174 @@
             </div>
         </div>
     </div>
+
+<script>
+// Disable the Space and Arrow key from scrolling
+window.addEventListener("keydown", function(e) {
+    // space and arrow keys
+    if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+        e.preventDefault();
+    }
+}, false);
+var canvas = document.getElementById('game');
+var context = canvas.getContext('2d');
+
+var grid = 16;
+var count = 0;
+  
+var snake = {
+  x: 160,
+  y: 160,
+  
+  // snake velocity. moves one grid length every frame in either the x or y direction
+  dx: grid,
+  dy: 0,
+  
+  // keep track of all grids the snake body occupies
+  cells: [],
+  
+  // length of the snake. grows when eating an view
+  maxCells: 12
+};
+
+var view = {
+    x: 320,
+    y: 320
+};
+
+var make = {
+    x: 352,
+    y: 352
+};
+
+view.x = getRandomInt(0, 25) * grid;
+view.y = getRandomInt(0, 25) * grid;
+make.x = getRandomInt(0, 25) * grid;
+make.y = getRandomInt(0, 25) * grid;
+
+// get random whole numbers in a specific range
+// @see https://stackoverflow.com/a/1527820/2124254
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min)) + min;
+}
+
+// game loop
+function loop() {
+  requestAnimationFrame(loop);
+
+  // slow game loop to 15 fps instead of 60 (60/15 = 4)
+  if (++count < 10) {
+    return;
+  }
+
+  count = 0;
+  context.clearRect(0,0,canvas.width,canvas.height);
+
+  // move snake by it's velocity
+  snake.x += snake.dx;
+  snake.y += snake.dy;
+
+  // wrap snake position horizontally on edge of screen
+  if (snake.x < 0) {
+    snake.x = canvas.width - grid;
+  }
+  else if (snake.x >= canvas.width) {
+    snake.x = 0;
+  }
+  
+  // wrap snake position vertically on edge of screen
+  if (snake.y < 0) {
+    snake.y = canvas.height - grid;
+  }
+  else if (snake.y >= canvas.height) {
+    snake.y = 0;
+  }
+
+  // keep track of where snake has been. front of the array is always the head
+  snake.cells.unshift({x: snake.x, y: snake.y});
+
+  // remove cells as we move away from them
+  if (snake.cells.length > snake.maxCells) {
+    snake.cells.pop();
+  }
+
+  // draw view
+  context.fillStyle = 'blue';
+  context.fillRect(view.x, view.y, grid-1, grid-1);
+
+    // draw Make
+  context.fillStyle = 'red';
+  context.fillRect(make.x, make.y, grid-1, grid-1);
+
+  // draw snake one cell at a time
+  context.fillStyle = 'green';
+  snake.cells.forEach(function(cell, index) {
+    
+    // drawing 1 px smaller than the grid creates a grid effect in the snake body so you can see how long it is
+    context.fillRect(cell.x, cell.y, grid-1, grid-1);  
+
+    // snake ate view
+    if (cell.x === view.x && cell.y === view.y) {
+        window.location.href = "view.html"
+    }
+
+    // snake ate make
+    if (cell.x === make.x && cell.y === make.y) {
+        window.location.href = "make.html"
+    }
+
+    // check collision with all cells after this one (modified bubble sort)
+    for (var i = index + 1; i < snake.cells.length; i++) {
+      
+      // snake occupies same space as a body part. reset game
+      if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) {
+        snake.x = 160;
+        snake.y = 160;
+        snake.cells = [];
+        snake.maxCells = 4;
+        snake.dx = grid;
+        snake.dy = 0;
+
+        view.x = getRandomInt(0, 25) * grid;
+        view.y = getRandomInt(0, 25) * grid;
+        make.x = getRandomInt(0, 25) * grid;
+        make.y = getRandomInt(0, 25) * grid;
+      }
+    }
+  });
+}
+
+// listen to keyboard events to move the snake
+document.addEventListener('keydown', function(e) {
+  // prevent snake from backtracking on itself by checking that it's 
+  // not already moving on the same axis (pressing left while moving
+  // left won't do anything, and pressing right while moving left
+  // shouldn't let you collide with your own body)
+  
+  // left arrow key
+  if (e.which === 37 && snake.dx === 0) {
+    snake.dx = -grid;
+    snake.dy = 0;
+  }
+  // up arrow key
+  else if (e.which === 38 && snake.dy === 0) {
+    snake.dy = -grid;
+    snake.dx = 0;
+  }
+  // right arrow key
+  else if (e.which === 39 && snake.dx === 0) {
+    snake.dx = grid;
+    snake.dy = 0;
+  }
+  // down arrow key
+  else if (e.which === 40 && snake.dy === 0) {
+    snake.dy = grid;
+    snake.dx = 0;
+  }
+});
+
+// start the game
+requestAnimationFrame(loop);
+</script>
 </body>
 </html>
