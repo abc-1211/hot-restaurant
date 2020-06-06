@@ -74,7 +74,7 @@
                   />
                 </div>
 
-                <button type="submit" class="btn btn-primary submit">
+                <button id= "submitBtn" type="submit" class="btn btn-primary submit">
                   Submit
                 </button>
               </form>
@@ -92,5 +92,23 @@
         </div>
       </footer>
     </div>
+
+    <script type="text/javascript">
+        $("#submitBtn").on("click", function(event) {
+          event.preventDefault();
+          var newTable = {
+            name: $("#reserve_name").val().trim(),
+            phone: $("#reserve_phone").val().trim(),
+            email: $("#reserve_email").val().trim(),
+            id: $("#reserve_uniqueID").val().trim()
+          };
+          $.post("/api/tables", newTable)
+            .then(function(data) {
+              console.log(data);
+              alert("Adding table...");
+            });
+        });
+      </script>
+
   </body>
 </html>
