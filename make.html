@@ -99,7 +99,10 @@
             name: $("#reserve_name").val().trim(),
             phone: $("#reserve_phone").val().trim(),
             email: $("#reserve_email").val().trim(),
-            id: $("#reserve_uniqueID").val().trim()
+            id: $("#reserve_uniqueID").val().trim(),
+            getName : function() {
+              return this.name;
+            }
           };
           $.post("/api/tables", newTable)
             .then(function(data) {
