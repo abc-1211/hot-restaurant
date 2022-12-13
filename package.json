@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/abc-1211/hot-restaurant#readme",
   "dependencies": {
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "nodemon": "^2.0.4",
     "util": "^0.12.3"
   }
